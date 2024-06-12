@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function PUT(request, { params }) {
   const { id } = params;
-  const { newLocation: location, newActive: active } = await request.json();
+  const { newLocation: location } = await request.json();
   await connectMongoDB();
-  await Location.findByIdAndUpdate(id, { location, active });
+  await Location.findByIdAndUpdate(id, { location });
   return NextResponse.json({ message: "Location updated" }, { status: 200 });
 }
 

@@ -3,7 +3,6 @@ import mongoose, { Schema } from "mongoose";
 const locationSchema = new Schema(
   {
     location: String,
-    active: Boolean,
   },
   {
     timestamps: true,

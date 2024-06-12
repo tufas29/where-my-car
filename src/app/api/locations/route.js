@@ -3,9 +3,9 @@ import Location from "../../../../models/location";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
-  const { location, active } = await request.json();
+  const { location } = await request.json();
   await connectMongoDB();
-  await Location.create({ location, active });
+  await Location.create({ location });
   return NextResponse.json({ message: "Location Created" }, { status: 201 });
 }
 

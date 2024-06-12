@@ -5,24 +5,35 @@ import style from "./page.module.css";
 import Spinner from "../../components/spinner/Spinner";
 import converTime from "../../utils/convertTime";
 
+const locations = [
+  "זוטא",
+  "פיס",
+  "הרצל",
+  "שיכון הריאל",
+  "דיסקונט",
+  "סטימצקי",
+  "שיקשק",
+  "עץ חרוב",
+  "דואר",
+  "בית הכרם",
+];
+
 const Home = () => {
-  const [data, setData] = useState(null);
-  const [isLoading, setLoading] = useState(true);
+  const [currentLocaton, setCurrentLocaton] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await fetch("/api/locations");
       const data = await response.json();
-      setData(data);
-      const activeLocation = data.locations.find((loc) => loc.active === true);
-      if (activeLocation) {
-        setLastUpdate(converTime(activeLocation.updatedAt));
-      }
+      setCurrentLocaton(data.locations[0].location);
+      setLastUpdate(converTime(data.locations[0].updatedAt));
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -31,38 +42,17 @@ const Home = () => {
   }, [fetchData]);
 
   const handleClick = async (item) => {
-    const prevActive = data.locations.find((loc) => loc.active === true);
-    const prevActiveId = prevActive ? prevActive._id : null;
-
-    const updatedLocations = data.locations.map((loc) =>
-      loc._id === item._id
-        ? { ...loc, active: true }
-        : { ...loc, active: false }
-    );
-    setData((prevData) => ({ ...prevData, locations: updatedLocations }));
+    setCurrentLocaton(item);
     setLastUpdate(converTime(new Date().toISOString()));
 
     try {
-      await fetch(`/api/locations/${item._id}`, {
+      await fetch(`/api/locations/666a2962d523ab452992cf17`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ newLocation: item.location, newActive: true }),
+        body: JSON.stringify({ newLocation: item }),
       });
-
-      if (prevActiveId) {
-        await fetch(`/api/locations/${prevActiveId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            newLocation: prevActive.location,
-            newActive: false,
-          }),
-        });
-      }
     } catch (error) {
       console.error("Error updating locations:", error);
     }
@@ -75,12 +65,17 @@ const Home = () => {
       </div>
     );
 
-  if (!data) return <p>No data</p>;
+  // if (!data) return <p>No data</p>;
 
   return (
     <div className={style.container}>
-      {data.locations.map((item) => (
-        <Button key={item._id} item={item} handleClick={handleClick} />
+      {locations.map((item) => (
+        <Button
+          key={item}
+          item={item}
+          currentLocation={currentLocaton}
+          handleClick={handleClick}
+        />
       ))}
       <p className={style.lastUpdate}>{`עדכון אחרון: ${lastUpdate}`}</p>
     </div>
