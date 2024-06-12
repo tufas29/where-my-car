@@ -20,12 +20,11 @@ const locations = [
 
 const Home = () => {
   const [currentLocaton, setCurrentLocaton] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
-      setIsLoading(true);
       const response = await fetch("/api/locations");
       const data = await response.json();
       setCurrentLocaton(data.locations[0].location);
@@ -65,7 +64,7 @@ const Home = () => {
       </div>
     );
 
-  if (!currentLocaton)
+  if (!isLoading && !currentLocaton)
     return (
       <div className={style.container}>
         <p>אירעה שגיאה</p>
