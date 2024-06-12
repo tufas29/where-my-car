@@ -65,7 +65,12 @@ const Home = () => {
       </div>
     );
 
-  // if (!data) return <p>No data</p>;
+  if (!currentLocaton)
+    return (
+      <div className={style.container}>
+        <p>אירעה שגיאה</p>
+      </div>
+    );
 
   return (
     <div className={style.container}>
