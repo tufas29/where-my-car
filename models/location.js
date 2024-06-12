@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const locationSchema = new Schema(
   {
-    name: String,
+    location: String,
     active: Boolean,
   },
   {
