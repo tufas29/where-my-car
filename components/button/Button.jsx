@@ -1,14 +1,13 @@
+"use client";
 import style from "./button.module.css";
 
-const Button = ({ location, active }) => {
-  const handleClick = () => {};
-
+const Button = ({ item, handleClick }) => {
   return (
     <button
-      className={`${style.button} ${active ? style.active : ""}`}
-      onClick={handleClick}
+      className={`${style.button} ${item.active ? style.active : ""}`}
+      onClick={() => handleClick(item)}
     >
-      {location}
+      {item.location}
     </button>
   );
 };
