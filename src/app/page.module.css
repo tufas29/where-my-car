@@ -1,8 +1,15 @@
 .container {
   height: 100vh;
   display: flex;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
   flex-direction: column;
   gap: 10px;
+}
+.header {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.85);
+  background-color: antiquewhite;
+  border-radius: 5px;
+  padding: 10px;
 }

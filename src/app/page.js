@@ -53,7 +53,7 @@ const Home = () => {
 
   return (
     <div className={style.container}>
-      <h1>איפה האוטו שלי?!</h1>
+      <h1 className={style.header}>איפה האוטו שלי?!</h1>
       {data.locations.map((item) => (
         <Button key={item._id} item={item} handleClick={handleClick} />
       ))}

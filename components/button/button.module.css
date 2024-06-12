@@ -1,12 +1,14 @@
 .button {
   width: 200px;
-  font-size: 22px;
+  font-size: 28px;
   border: none;
   border-radius: 5px;
   padding: 5px;
+  font-family: inherit;
   cursor: pointer;
 }
 .active {
   font-weight: bold;
   color: green;
+  background-color: antiquewhite;
 }
