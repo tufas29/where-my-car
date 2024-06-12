@@ -25,6 +25,7 @@ const Home = () => {
 
   return (
     <div className={style.container}>
+      <h1>איפה האוטו שלי?!</h1>
       {data.locations.map((item) => (
         <Button
           key={item.location}
