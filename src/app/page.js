@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Button from "../../components/button/Button";
 import style from "./page.module.css";
 import Spinner from "../../components/spinner/Spinner";
@@ -10,49 +10,62 @@ const Home = () => {
   const [isLoading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetch("/api/locations")
-        .then((res) => res.json())
-        .then((data) => {
-          setData(data);
-          setLoading(false);
-          const activeLocation = data.locations.find(
-            (loc) => loc.active === true
-          );
-          if (activeLocation) {
-            setLastUpdate(converTime(activeLocation.updatedAt));
-          }
-        });
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch("/api/locations");
+      const data = await response.json();
+      setData(data);
+      const activeLocation = data.locations.find((loc) => loc.active === true);
+      if (activeLocation) {
+        setLastUpdate(converTime(activeLocation.updatedAt));
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const handleClick = async (item) => {
-    const prevActiveId = data.locations.find((l) => l.active === true)._id;
+    const prevActive = data.locations.find((loc) => loc.active === true);
+    const prevActiveId = prevActive ? prevActive._id : null;
 
     const updatedLocations = data.locations.map((loc) =>
-      loc.location === item.location
+      loc._id === item._id
         ? { ...loc, active: true }
         : { ...loc, active: false }
     );
-    setData({ locations: updatedLocations });
+    setData((prevData) => ({ ...prevData, locations: updatedLocations }));
     setLastUpdate(converTime(new Date().toISOString()));
-    await fetch(`/api/locations/${item._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ newLocation: item.location, newActive: true }),
-    });
 
-    await fetch(`/api/locations/${prevActiveId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ newLocation: item.location, newActive: false }),
-    });
+    try {
+      await fetch(`/api/locations/${item._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ newLocation: item.location, newActive: true }),
+      });
+
+      if (prevActiveId) {
+        await fetch(`/api/locations/${prevActiveId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            newLocation: prevActive.location,
+            newActive: false,
+          }),
+        });
+      }
+    } catch (error) {
+      console.error("Error updating locations:", error);
+    }
   };
 
   if (isLoading)
@@ -61,6 +74,7 @@ const Home = () => {
         <Spinner />
       </div>
     );
+
   if (!data) return <p>No data</p>;
 
   return (
