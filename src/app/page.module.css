@@ -6,10 +6,6 @@
   margin-top: 5px;
   gap: 10px;
 }
-.header {
-  text-align: center;
-  color: rgba(0, 0, 0, 0.85);
-  background-color: antiquewhite;
-  border-radius: 5px;
-  padding: 10px;
+.lastUpdate {
+  color: rgba(0, 128, 0, 0.448);
 }

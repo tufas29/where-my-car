@@ -2,18 +2,30 @@
 import { useState, useEffect } from "react";
 import Button from "../../components/button/Button";
 import style from "./page.module.css";
+import Spinner from "../../components/spinner/Spinner";
+import converTime from "../../utils/convertTime";
 
 const Home = () => {
   const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState(null);
 
   useEffect(() => {
-    fetch("/api/locations")
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        setLoading(false);
-      });
+    const fetchData = async () => {
+      await fetch("/api/locations")
+        .then((res) => res.json())
+        .then((data) => {
+          setData(data);
+          setLoading(false);
+          const activeLocation = data.locations.find(
+            (loc) => loc.active === true
+          );
+          if (activeLocation) {
+            setLastUpdate(converTime(activeLocation.updatedAt));
+          }
+        });
+    };
+    fetchData();
   }, []);
 
   const handleClick = async (item) => {
@@ -25,7 +37,7 @@ const Home = () => {
         : { ...loc, active: false }
     );
     setData({ locations: updatedLocations });
-
+    setLastUpdate(converTime(new Date().toISOString()));
     await fetch(`/api/locations/${item._id}`, {
       method: "PUT",
       headers: {
@@ -46,17 +58,17 @@ const Home = () => {
   if (isLoading)
     return (
       <div className={style.container}>
-        <p>בטעינה....</p>
+        <Spinner />
       </div>
     );
-  if (!data) return <p>No profile data</p>;
+  if (!data) return <p>No data</p>;
 
   return (
     <div className={style.container}>
-      <h1 className={style.header}>איפה האוטו שלי?!</h1>
       {data.locations.map((item) => (
         <Button key={item._id} item={item} handleClick={handleClick} />
       ))}
+      <p className={style.lastUpdate}>{`עדכון אחרון: ${lastUpdate}`}</p>
     </div>
   );
 };
