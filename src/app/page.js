@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Button from "../../components/button/Button";
 import style from "./page.module.css";
 import Spinner from "../../components/spinner/Spinner";
@@ -23,6 +23,8 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(null);
 
+  const didInit = useRef(false);
+
   const fetchData = useCallback(async () => {
     try {
       const response = await fetch("/api/locations");
@@ -37,7 +39,10 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    if (!didInit.current) {
+      fetchData();
+      didInit.current = true;
+    }
   }, [fetchData]);
 
   const handleClick = async (item) => {
